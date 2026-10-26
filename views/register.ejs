@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - Scan Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="center-page">
+    <div class="card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Track barcode scans coming from your Scan app.</p>
+
+      <% if (error) { %>
+        <div class="error-box"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/register">
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="6">
+
+        <button type="submit" class="btn-block">Create Account</button>
+      </form>
+
+      <div class="footer-link">
+        Already have an account? <a href="/login">Log in</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

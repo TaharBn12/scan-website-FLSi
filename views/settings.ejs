@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Scan Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <%- include('partials/topbar', { active: 'settings' }) %>
+
+  <div class="container">
+    <div class="page-title">Settings</div>
+    <div class="page-subtitle">Link this account to your phone's Scan app.</div>
+
+    <% if (saved) { %>
+      <div class="success-box">Token saved.</div>
+    <% } %>
+
+    <div class="settings-card">
+      <label style="margin-top:0">Phone Token</label>
+      <% if (user.scanToken) { %>
+        <div class="token-box"><%= user.scanToken %></div>
+      <% } %>
+      <form method="POST" action="/settings/token">
+        <input type="text" name="scanToken" placeholder="Paste the token from your phone's Settings"
+               value="<%= user.scanToken || '' %>">
+        <div class="hint">
+          On your phone: open the app &rarr; Menu &rarr; Settings &rarr; Website Sync &rarr; tap the copy icon next to your token.
+          Then also set the Website URL there to:
+          <code><%= apiUrl %></code>
+        </div>
+        <button type="submit" class="btn-block">Save Token</button>
+      </form>
+    </div>
+
+    <div class="settings-card">
+      <label style="margin-top:0">Account</label>
+      <div class="hint" style="margin-top:0"><%= user.name %> &middot; <%= user.email %></div>
+    </div>
+  </div>
+</body>
+</html>

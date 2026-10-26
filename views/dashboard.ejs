@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scans - Scan Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <%- include('partials/topbar', { active: 'dashboard' }) %>
+
+  <div class="container">
+    <div class="page-title">Incoming Scans</div>
+    <div class="page-subtitle">
+      <% if (user.scanToken) { %>
+        Linked and listening for scans from your phone.
+      <% } else { %>
+        ⚠️ No token linked yet - go to <a href="/settings">Settings</a> and paste the token from your phone's app.
+      <% } %>
+    </div>
+
+    <div id="scan-list">
+      <% if (scans.length === 0) { %>
+        <div class="empty-state">
+          No scans yet. Scan a barcode in the app and it'll show up here automatically.
+        </div>
+      <% } else { %>
+        <% scans.forEach(scan => { %>
+          <div class="scan-item">
+            <div class="scan-main">
+              <div class="scan-name"><%= scan.productName || 'Unknown product' %></div>
+              <div class="scan-barcode"><%= scan.barcode %></div>
+              <div class="scan-time"><%= new Date(scan.scannedAt).toLocaleString() %></div>
+            </div>
+            <% if (scan.price !== null) { %>
+              <div class="scan-price">DA<%= Number(scan.price).toFixed(2) %></div>
+            <% } %>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // Light polling so newly scanned items show up without a manual refresh.
+    async function refreshScans() {
+      try {
+        const res = await fetch('/api/scans');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = document.getElementById('scan-list');
+        if (data.scans.length === 0) {
+          list.innerHTML = '<div class="empty-state">No scans yet. Scan a barcode in the app and it\'ll show up here automatically.</div>';
+          return;
+        }
+        list.innerHTML = data.scans.map(scan => `
+          <div class="scan-item">
+            <div class="scan-main">
+              <div class="scan-name">${scan.productName || 'Unknown product'}</div>
+              <div class="scan-barcode">${scan.barcode}</div>
+              <div class="scan-time">${new Date(scan.scannedAt).toLocaleString()}</div>
+            </div>
+            ${scan.price !== null ? `<div class="scan-price">DA${Number(scan.price).toFixed(2)}</div>` : ''}
+          </div>
+        `).join('');
+      } catch (e) {
+        // Ignore transient network errors; next poll will retry.
+      }
+    }
+    setInterval(refreshScans, 5000);
+  </script>
+</body>
+</html>
